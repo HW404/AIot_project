@@ -3,7 +3,7 @@ import time
 import random
 
 def client_program():
-    host = '000.000.000.000'
+    host = '192.168.0.124'
     port = 10020
     
     while True:
