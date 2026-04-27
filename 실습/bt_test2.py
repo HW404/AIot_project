@@ -1,6 +1,6 @@
 import bluetooth
 
-target_address = "00:00:00:00:00:00"
+target_address = "98:DA:60:11:22:76"
 port = 1
 
 def receive_message(sock):
