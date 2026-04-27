@@ -3,9 +3,9 @@ import time
 import random
 import bluetooth
 
-bt_address = "00:00:00:00:00:00"
+bt_address = "98:DA:60:11:22:76"
 bt_port = 1
-sock_host = '000.000.000.000'
+sock_host = '192.168.0.124'
 sock_port = 10020
 
 def bt_receive_msg(sock):
