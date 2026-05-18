@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SensorEscape</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- ==================== 시작 화면 (Lobby) ==================== -->
+    <div id="lobby-screen" class="screen active">
+        <div class="lobby-content">
+            <h1 class="game-title">SENSOR ESCAPE</h1>
+            <p class="game-subtitle">폐창고에서 탈출하라</p>
+            <div class="story-text">
+                <p>오래전 운영되다 갑자기 폐쇄된 폐창고.</p>
+                <p>안에서 무언가를 찾아오라는 의뢰를 받고 도착한 곳.</p>
+                <p>어느 순간 눈을 뜨니 홀로 갇혀 있다.</p>
+                <p>손에는 손전등 하나.</p>
+                <p>일단 이곳에서 빠져나가야겠다.</p>
+            </div>
+            <button id="start-btn" class="btn-primary">게임 시작</button>
+            <div class="connection-status">
+                <span class="status-dot mock"></span>
+                <span id="connection-text">Mock 모드 (센서 미연결)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 게임 화면 ==================== -->
+    <div id="game-screen" class="screen">
+        
+        <!-- 상단 HUD -->
+        <div class="hud-top">
+            <div class="hud-item">
+                <span class="hud-label">경과 시간</span>
+                <span id="timer" class="hud-value">00:00</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">현재 위치</span>
+                <span id="current-view-label" class="hud-value">정면</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">전력</span>
+                <span id="power-status" class="hud-value">차단됨</span>
+            </div>
+        </div>
+
+        <!-- 메인 뷰포트 (방의 한 면 표시) -->
+        <div id="viewport" class="viewport">
+            
+            <!-- 정면 (앞벽) - 출구 -->
+            <div class="wall front-wall active" data-view="front">
+                <div class="wall-image" 
+                     style="background-image: url('/static/images/walls/front_wall.png');">
+                    <span class="img-placeholder">앞벽 - 잠긴 출구</span>
+                </div>
+                <div class="wall-content">
+                    <div id="exit-panel" class="exit-panel hidden">
+                        <p class="puzzle-text">최종 탈출구</p>
+                        <p class="hint-text">모든 퍼즐을 해결하면 열립니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 뒷벽 - 무전기 & 키패드 -->
+            <div class="wall back-wall" data-view="back">
+                <div class="wall-image" 
+                     style="background-image: url('/static/images/walls/back_wall.png');">
+                    <span class="img-placeholder">뒷벽 - 무전기 & 작업대</span>
+                </div>
+                <div class="wall-content">
+                    <!-- 무전기 퍼즐 영역 -->
+                    <div id="radio-puzzle" class="puzzle-area hidden">
+                        <p class="puzzle-text">낡은 무전기에서 잡음이 들린다.</p>
+                    </div>
+                    <!-- 모스 퍼즐 영역 -->
+                    <div id="morse-puzzle" class="puzzle-area hidden">
+                        <p class="puzzle-text">모스 신호가 들어온다.</p>
+                    </div>
+                    <!-- 키패드 퍼즐 영역 -->
+                    <div id="keypad-puzzle" class="puzzle-area hidden">
+                        <p class="puzzle-text">최종 암호를 입력하라.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 좌측 벽 - 전선 패널 -->
+            <div class="wall left-wall" data-view="left">
+                <div class="wall-image" 
+                     style="background-image: url('/static/images/walls/left_wall.png');">
+                    <span class="img-placeholder">왼쪽벽 - 냉각 전선 패널</span>
+                </div>
+                <div class="wall-content">
+                    <div id="cable-puzzle" class="puzzle-area hidden">
+                        <p class="puzzle-text">전선 패널이 꽁꽁 얼어붙어 있다.</p>
+                        <p class="hint-text">체온을 가해 녹여야 한다.</p>
+                        <div class="temp-gauge-container">
+                            <div class="temp-gauge">
+                                <div id="temp-fill" class="temp-fill"></div>
+                            </div>
+                            <span id="temp-value">0°C</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 벽 - 망원경 -->
+            <div class="wall right-wall" data-view="right">
+                <div class="wall-image" 
+                     style="background-image: url('/static/images/walls/right_wall.png');">
+                    <span class="img-placeholder">오른쪽벽 - 망원경 & 암호판</span>
+                </div>
+                <div class="wall-content">
+                    <div id="telescope-puzzle" class="puzzle-area hidden">
+                        <p class="puzzle-text">망원경 초점이 맞지 않아 흐릿하다.</p>
+                        <div class="telescope-view">
+                            <div id="telescope-blur" class="telescope-blur">
+                                <span class="img-placeholder">암호판 이미지</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 천장 -->
+            <div class="wall ceiling-wall" data-view="ceiling">
+                <div class="wall-image" 
+                     style="background-image: url('/static/images/walls/ceiling.png');">
+                    <span class="img-placeholder">천장 - 꺼진 전구들</span>
+                </div>
+                <div class="wall-content">
+                    <p class="puzzle-text">어두운 천장. 무언가 적혀있는 것 같다.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 손전등 오버레이 (전력 복구 전에만 활성) -->
+        <div id="flashlight-overlay" class="flashlight-overlay">
+            <div id="flashlight-circle" class="flashlight-circle hidden"></div>
+        </div>
+
+        <!-- 시점 전환 컨트롤 -->
+        <div class="view-controls">
+            <button class="view-btn view-up" data-direction="up" title="천장 보기">↑</button>
+            <div class="view-controls-mid">
+                <button class="view-btn view-left" data-direction="left" title="왼쪽">←</button>
+                <button class="view-btn view-front" data-direction="front" title="정면">⊙</button>
+                <button class="view-btn view-right" data-direction="right" title="오른쪽">→</button>
+            </div>
+            <button class="view-btn view-down" data-direction="down" title="뒤돌아 보기">↓</button>
+        </div>
+
+        <!-- 손전등 토글 버튼 -->
+        <button id="flashlight-btn" class="flashlight-btn">
+            <span class="icon">🔦</span>
+            <span class="label">손전등</span>
+        </button>
+
+        <!-- 인벤토리 (발견한 단서) -->
+        <div id="inventory" class="inventory">
+            <h3>발견한 단서</h3>
+            <ul id="inventory-list"></ul>
+        </div>
+
+        <!-- AI 힌트 박스 -->
+        <div id="hint-box" class="hint-box hidden">
+            <div class="hint-header">
+                <span>AI 힌트</span>
+                <button id="hint-close">×</button>
+            </div>
+            <div id="hint-content" class="hint-content"></div>
+        </div>
+
+        <!-- 디버그 패널 (개발용) -->
+        <div id="debug-panel" class="debug-panel">
+            <button id="debug-toggle" class="debug-toggle">≡ DEBUG</button>
+            <div id="debug-content" class="debug-content hidden">
+                <h4>센서 시뮬레이터</h4>
+                
+                <div class="debug-row">
+                    <label>CDS 조도</label>
+                    <input type="range" id="sim-cds" min="0" max="1023" value="0">
+                    <span id="sim-cds-val">0</span>
+                </div>
+                
+                <div class="debug-row">
+                    <label>온도 (°C)</label>
+                    <input type="range" id="sim-temp" min="-10" max="50" value="0">
+                    <span id="sim-temp-val">0</span>
+                </div>
+                
+                <div class="debug-row">
+                    <label>거리 (cm)</label>
+                    <input type="range" id="sim-distance" min="0" max="100" value="50">
+                    <span id="sim-distance-val">50</span>
+                </div>
+                
+                <div class="debug-row">
+                    <label>주파수</label>
+                    <input type="range" id="sim-potentiometer" min="0" max="1023" value="0">
+                    <span id="sim-potentiometer-val">0</span>
+                </div>
+                
+                <hr>
+                <h4>강제 조작</h4>
+                <button class="debug-btn" id="force-power">전력 복구 토글</button>
+                <button class="debug-btn" id="force-hint">힌트 발생</button>
+                <button class="debug-btn" id="force-clear-puzzle">현재 퍼즐 클리어</button>
+                <button class="debug-btn" id="force-restart">게임 재시작</button>
+                
+                <hr>
+                <h4>상태</h4>
+                <pre id="debug-state"></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== 종료 화면 ==================== -->
+    <div id="end-screen" class="screen">
+        <div class="end-content">
+            <h1 id="end-title">탈출 성공!</h1>
+            <div class="end-stats">
+                <div class="stat-row">
+                    <span>완주 시간</span>
+                    <span id="end-time">00:00</span>
+                </div>
+                <div class="stat-row">
+                    <span>사용한 힌트</span>
+                    <span id="end-hints">0회</span>
+                </div>
+            </div>
+            <button id="restart-btn" class="btn-primary">다시 시작</button>
+        </div>
+    </div>
+
+    <!-- ==================== 스크립트 로드 순서 ==================== -->
+    <script src="/static/js/gameState.js"></script>
+    <script src="/static/js/gameService.js"></script>
+    <script src="/static/js/flashlight.js"></script>
+    <script src="/static/js/puzzles/leftWall.js"></script>
+    <script src="/static/js/puzzles/rightWall.js"></script>
+    <script src="/static/js/puzzles/backWall.js"></script>
+    <script src="/static/js/puzzles/frontWall.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

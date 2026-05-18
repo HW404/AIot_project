@@ -1,0 +1,662 @@
+/* ==================== 기본 리셋 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', 'Noto Sans KR', monospace;
+    background: #1a1410;
+    color: #d4c4a8;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ==================== 화면 전환 ==================== */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ==================== 시작 화면 (Lobby) ==================== */
+#lobby-screen {
+    background: linear-gradient(135deg, #2a1810 0%, #1a0e08 100%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#lobby-screen.active {
+    display: flex;
+}
+
+.lobby-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+}
+
+.game-title {
+    font-size: 64px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    color: #e8c896;
+    margin-bottom: 12px;
+    text-shadow: 0 0 20px rgba(232, 200, 150, 0.3);
+}
+
+.game-subtitle {
+    font-size: 20px;
+    color: #a08868;
+    margin-bottom: 40px;
+    letter-spacing: 4px;
+}
+
+.story-text {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 30px;
+    border-left: 3px solid #8a6840;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.story-text p {
+    margin-bottom: 8px;
+    line-height: 1.8;
+    color: #c4b498;
+}
+
+.btn-primary {
+    background: #8a6840;
+    color: #f4e4c8;
+    padding: 14px 48px;
+    border: none;
+    font-size: 18px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.btn-primary:hover {
+    background: #a07850;
+    transform: translateY(-2px);
+}
+
+.connection-status {
+    margin-top: 30px;
+    font-size: 12px;
+    color: #806848;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.mock { background: #d4a050; }
+.status-dot.connected { background: #50d480; }
+.status-dot.disconnected { background: #d45050; }
+
+/* ==================== 게임 화면 ==================== */
+#game-screen.active {
+    display: block;
+}
+
+/* 상단 HUD */
+.hud-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 30px;
+    z-index: 100;
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hud-label {
+    font-size: 11px;
+    color: #806848;
+    letter-spacing: 2px;
+}
+
+.hud-value {
+    font-size: 18px;
+    color: #e8c896;
+    font-weight: bold;
+}
+
+/* ==================== 뷰포트 (방의 한 면) ==================== */
+.viewport {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.wall {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    transition: opacity 0.4s ease;
+}
+
+.wall.active {
+    display: block;
+}
+
+/* 벽 배경 이미지 (사용자가 나중에 추가) */
+.wall-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: #2a1f15;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 이미지가 없을 때 표시되는 placeholder */
+.img-placeholder {
+    position: absolute;
+    color: #604830;
+    font-size: 14px;
+    letter-spacing: 4px;
+    border: 2px dashed #604830;
+    padding: 40px 60px;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+/* 이미지가 로드되면 placeholder 숨김 처리는 JS에서 */
+.wall-image.has-image .img-placeholder {
+    display: none;
+}
+
+/* 벽별 콘텐츠 (퍼즐 UI 등) */
+.wall-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.puzzle-area {
+    background: rgba(20, 14, 8, 0.85);
+    border: 1px solid #604830;
+    padding: 30px 40px;
+    max-width: 500px;
+    text-align: center;
+}
+
+.puzzle-area.hidden {
+    display: none;
+}
+
+.puzzle-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #e8c896;
+    margin-bottom: 12px;
+}
+
+.hint-text {
+    font-size: 13px;
+    color: #a08868;
+    font-style: italic;
+}
+
+/* ==================== 손전등 오버레이 ==================== */
+.flashlight-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.92);
+    transition: background 0.3s;
+}
+
+/* 전력 복구되면 손전등 오버레이 자체가 꺼짐 */
+.flashlight-overlay.power-on {
+    background: transparent;
+}
+
+/* 손전등 켰을 때: 중앙에 원형으로 빛 */
+.flashlight-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+        circle,
+        transparent 0%,
+        transparent 30%,
+        rgba(0, 0, 0, 0.4) 60%,
+        rgba(0, 0, 0, 0.92) 100%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.flashlight-circle.hidden {
+    display: none;
+}
+
+/* 손전등 켜진 상태: 어두운 배경을 뚫는 효과 */
+.flashlight-overlay.flashlight-on {
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        transparent 15%,
+        rgba(0, 0, 0, 0.7) 35%,
+        rgba(0, 0, 0, 0.95) 60%
+    );
+}
+
+/* ==================== 시점 전환 컨트롤 ==================== */
+.view-controls {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 100;
+}
+
+.view-controls-mid {
+    display: flex;
+    gap: 6px;
+}
+
+.view-btn {
+    width: 48px;
+    height: 48px;
+    background: rgba(20, 14, 8, 0.85);
+    border: 1px solid #604830;
+    color: #e8c896;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.view-btn:hover {
+    background: rgba(96, 72, 48, 0.85);
+    border-color: #8a6840;
+}
+
+.view-btn.active {
+    background: #604830;
+    border-color: #e8c896;
+}
+
+/* ==================== 손전등 토글 버튼 ==================== */
+.flashlight-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: rgba(20, 14, 8, 0.85);
+    border: 1px solid #604830;
+    color: #e8c896;
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.2s;
+    z-index: 100;
+}
+
+.flashlight-btn:hover {
+    background: rgba(96, 72, 48, 0.85);
+}
+
+.flashlight-btn.active {
+    background: #8a6840;
+    box-shadow: 0 0 20px rgba(232, 200, 150, 0.4);
+}
+
+.flashlight-btn .icon {
+    font-size: 20px;
+}
+
+/* 전력 복구 후엔 손전등 버튼 숨김 */
+.flashlight-btn.disabled {
+    display: none;
+}
+
+/* ==================== 인벤토리 ==================== */
+.inventory {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 220px;
+    background: rgba(20, 14, 8, 0.85);
+    border: 1px solid #604830;
+    padding: 16px;
+    z-index: 90;
+}
+
+.inventory h3 {
+    font-size: 13px;
+    color: #a08868;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #604830;
+    padding-bottom: 8px;
+}
+
+.inventory ul {
+    list-style: none;
+    font-size: 12px;
+    color: #c4b498;
+}
+
+.inventory li {
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(96, 72, 48, 0.4);
+    cursor: pointer;
+}
+
+.inventory li:hover {
+    color: #e8c896;
+}
+
+.inventory li:last-child {
+    border-bottom: none;
+}
+
+/* ==================== AI 힌트 박스 ==================== */
+.hint-box {
+    position: fixed;
+    bottom: 100px;
+    left: 30px;
+    width: 320px;
+    background: rgba(20, 14, 8, 0.95);
+    border: 1px solid #8a6840;
+    z-index: 200;
+    box-shadow: 0 0 30px rgba(232, 200, 150, 0.2);
+}
+
+.hint-box.hidden {
+    display: none;
+}
+
+.hint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #604830;
+    color: #f4e4c8;
+    font-size: 13px;
+    letter-spacing: 2px;
+}
+
+.hint-header button {
+    background: none;
+    border: none;
+    color: #f4e4c8;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.hint-content {
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d4c4a8;
+}
+
+/* ==================== 온도 게이지 (왼쪽 벽 퍼즐) ==================== */
+.temp-gauge-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+}
+
+.temp-gauge {
+    width: 200px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #604830;
+    overflow: hidden;
+}
+
+.temp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4080d4 0%, #d44040 100%);
+    transition: width 0.3s;
+}
+
+#temp-value {
+    font-size: 14px;
+    color: #e8c896;
+    min-width: 50px;
+}
+
+/* ==================== 망원경 (오른쪽 벽 퍼즐) ==================== */
+.telescope-view {
+    margin-top: 20px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 4px solid #604830;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    background: #1a1410;
+}
+
+.telescope-blur {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px);
+    transition: filter 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== 디버그 패널 ==================== */
+.debug-panel {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    z-index: 300;
+}
+
+.debug-toggle {
+    background: rgba(20, 14, 8, 0.9);
+    border: 1px solid #604830;
+    color: #e8c896;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-family: inherit;
+}
+
+.debug-content {
+    margin-top: 8px;
+    background: rgba(0, 0, 0, 0.92);
+    border: 1px solid #604830;
+    padding: 16px;
+    width: 280px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.debug-content.hidden {
+    display: none;
+}
+
+.debug-content h4 {
+    font-size: 12px;
+    color: #a08868;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.debug-content hr {
+    border: none;
+    border-top: 1px dashed #604830;
+    margin: 12px 0;
+}
+
+.debug-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: #c4b498;
+}
+
+.debug-row label {
+    width: 70px;
+}
+
+.debug-row input[type="range"] {
+    flex: 1;
+}
+
+.debug-row span {
+    width: 40px;
+    text-align: right;
+    color: #e8c896;
+}
+
+.debug-btn {
+    display: block;
+    width: 100%;
+    background: #604830;
+    color: #f4e4c8;
+    border: none;
+    padding: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    letter-spacing: 1px;
+}
+
+.debug-btn:hover {
+    background: #8a6840;
+}
+
+#debug-state {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    font-size: 10px;
+    color: #a08868;
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ==================== 종료 화면 ==================== */
+#end-screen {
+    background: linear-gradient(135deg, #2a1810 0%, #1a0e08 100%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#end-screen.active {
+    display: flex;
+}
+
+.end-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 40px;
+}
+
+.end-content h1 {
+    font-size: 48px;
+    color: #e8c896;
+    margin-bottom: 30px;
+    letter-spacing: 6px;
+}
+
+.end-stats {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 24px;
+    margin-bottom: 30px;
+    border-left: 3px solid #8a6840;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    color: #c4b498;
+}
+
+.stat-row:not(:last-child) {
+    border-bottom: 1px dashed rgba(96, 72, 48, 0.4);
+}
+
+/* ==================== 공통 ==================== */
+.hidden {
+    display: none !important;
+}
