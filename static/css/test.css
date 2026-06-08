@@ -1,0 +1,574 @@
+/* ==================== 기본 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', 'Noto Sans KR', monospace;
+    background: linear-gradient(135deg, #2a1810 0%, #1a0e08 100%);
+    color: #d4c4a8;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.test-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ==================== 헤더 ==================== */
+.test-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.test-header h1 {
+    font-size: 36px;
+    letter-spacing: 6px;
+    color: #e8c896;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #a08868;
+    letter-spacing: 3px;
+    font-size: 14px;
+}
+
+.back-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #a08868;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid #604830;
+    transition: all 0.2s;
+}
+
+.back-link:hover {
+    background: #604830;
+    color: #f4e4c8;
+}
+
+/* ==================== 상태 카드 ==================== */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.status-card {
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    padding: 20px;
+}
+
+.status-label {
+    font-size: 11px;
+    color: #806848;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.status-value {
+    font-size: 16px;
+    color: #e8c896;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-value .text.big {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.status-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #806848;
+}
+
+/* 연결 상태 점 */
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.dot.connected {
+    background: #50d480;
+    box-shadow: 0 0 12px rgba(80, 212, 128, 0.6);
+    animation: pulse 2s infinite;
+}
+
+.dot.disconnected {
+    background: #d45050;
+}
+
+.dot.idle {
+    background: #d4a050;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 새 메시지 도착 시 깜빡임 */
+.flash {
+    animation: flash-bg 0.4s;
+}
+
+@keyframes flash-bg {
+    0% { background: rgba(232, 200, 150, 0.2); }
+    100% { background: rgba(20, 14, 8, 0.6); }
+}
+
+/* ==================== 로그 영역 ==================== */
+.log-section {
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    margin-bottom: 30px;
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #604830;
+}
+
+.log-header h2 {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #a08868;
+    text-transform: uppercase;
+}
+
+.log-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn {
+    background: #604830;
+    color: #f4e4c8;
+    border: none;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: #8a6840;
+}
+
+.auto-scroll {
+    font-size: 12px;
+    color: #a08868;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.log-area {
+    height: 400px;
+    overflow-y: auto;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    background: #0d0805;
+}
+
+.log-placeholder {
+    color: #604830;
+    font-style: italic;
+    text-align: center;
+    padding: 100px 0;
+}
+
+.log-line {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(96, 72, 48, 0.2);
+    animation: log-in 0.2s;
+}
+
+@keyframes log-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.log-time {
+    color: #604830;
+    font-size: 11px;
+    min-width: 70px;
+}
+
+.log-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    height: fit-content;
+    min-width: 60px;
+    text-align: center;
+}
+
+.log-tag.serial {
+    background: #4080d4;
+    color: #fff;
+}
+
+.log-tag.sensor {
+    background: #50a070;
+    color: #fff;
+}
+
+.log-tag.sensors {
+    background: #50a070;
+    color: #fff;
+}
+
+.log-tag.event {
+    background: #c060c0;
+    color: #fff;
+}
+
+.log-tag.state {
+    background: #a08868;
+    color: #1a0e08;
+}
+
+.log-tag.error {
+    background: #d45050;
+    color: #fff;
+}
+
+.log-tag.unknown {
+    background: #806848;
+    color: #f4e4c8;
+}
+
+.log-tag.status {
+    background: #d4a050;
+    color: #1a0e08;
+}
+
+.log-tag.system {
+    background: #604830;
+    color: #f4e4c8;
+}
+
+.log-msg {
+    color: #d4c4a8;
+    flex: 1;
+    word-break: break-all;
+}
+
+/* 스크롤바 (다크 테마) */
+.log-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.log-area::-webkit-scrollbar-track {
+    background: #0d0805;
+}
+
+.log-area::-webkit-scrollbar-thumb {
+    background: #604830;
+}
+
+.log-area::-webkit-scrollbar-thumb:hover {
+    background: #8a6840;
+}
+
+/* ==================== 도움말 ==================== */
+.help-section {
+    background: rgba(20, 14, 8, 0.4);
+    border: 1px solid #604830;
+    padding: 24px;
+}
+
+.help-section h3 {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: #a08868;
+    margin-bottom: 12px;
+    margin-top: 16px;
+    text-transform: uppercase;
+}
+
+.help-section h3:first-child {
+    margin-top: 0;
+}
+
+.help-section ol,
+.help-section ul {
+    padding-left: 24px;
+    color: #c4b498;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.help-section code {
+    background: rgba(0, 0, 0, 0.5);
+    color: #e8c896;
+    padding: 2px 6px;
+    font-family: inherit;
+    font-size: 12px;
+    border: 1px solid #604830;
+}
+
+.help-section strong {
+    color: #e8c896;
+}
+
+/* ==================== 섹션 타이틀 (공통) ==================== */
+.section-title {
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: #a08868;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+
+/* ==================== 센서 카드 그리드 ==================== */
+.sensor-section {
+    margin-bottom: 32px;
+}
+
+.sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 1100px) {
+    .sensor-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .sensor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.sensor-card {
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    padding: 16px 14px;
+    text-align: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sensor-card.online {
+    border-color: #50a070;
+    box-shadow: 0 0 8px rgba(80, 160, 112, 0.2);
+}
+
+.sensor-card.offline {
+    opacity: 0.5;
+}
+
+.sensor-card.stale {
+    border-color: #d4a050;
+    opacity: 0.7;
+}
+
+.sensor-card.flash {
+    animation: sensor-flash 0.4s ease-out;
+}
+
+@keyframes sensor-flash {
+    0% { background: rgba(80, 160, 112, 0.3); }
+    100% { background: rgba(20, 14, 8, 0.6); }
+}
+
+.sensor-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.sensor-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #604830;
+    transition: background 0.3s;
+}
+
+.sensor-dot.online {
+    background: #50a070;
+    box-shadow: 0 0 6px #50a070;
+}
+
+.sensor-dot.stale {
+    background: #d4a050;
+}
+
+.sensor-dot.offline {
+    background: #604830;
+}
+
+.sensor-name {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #a08868;
+    font-weight: 600;
+}
+
+.sensor-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e8c896;
+    margin: 4px 0;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    word-break: break-all;
+}
+
+.sensor-card.online .sensor-value {
+    color: #d0e8c0;
+}
+
+.sensor-meta {
+    font-size: 10px;
+    color: #806848;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.sensor-time {
+    font-size: 10px;
+    color: #604830;
+    letter-spacing: 0.5px;
+}
+
+/* ==================== 게임 이벤트 카드 ==================== */
+.event-section {
+    margin-bottom: 32px;
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.event-header .section-title {
+    margin-bottom: 0;
+}
+
+.event-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-event {
+    padding: 6px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    color: #c4b498;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.btn-event:hover {
+    background: rgba(96, 72, 48, 0.8);
+    color: #f4e4c8;
+}
+
+.btn-event.btn-warn {
+    border-color: #804040;
+    color: #e8a896;
+}
+
+.btn-event.btn-warn:hover {
+    background: rgba(140, 50, 50, 0.6);
+    border-color: #b06060;
+    color: #f4e4c8;
+}
+
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 700px) {
+    .event-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.event-card {
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.event-card.active {
+    border-color: #d4a050;
+    background: rgba(212, 160, 80, 0.1);
+    box-shadow: 0 0 12px rgba(212, 160, 80, 0.3);
+}
+
+.event-card.success {
+    border-color: #50a070;
+    background: rgba(80, 160, 112, 0.1);
+}
+
+.event-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #806848;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.event-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #c4b498;
+    font-variant-numeric: tabular-nums;
+}
+
+.event-card.active .event-value {
+    color: #f4e4c8;
+}
+
+.event-card.success .event-value {
+    color: #d0e8c0;
+}

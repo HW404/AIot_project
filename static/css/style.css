@@ -152,6 +152,25 @@ body {
     font-weight: bold;
 }
 
+.hud-reset {
+    background: rgba(80, 30, 30, 0.6);
+    border: 1px solid #804040;
+    color: #e8a896;
+    padding: 6px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.hud-reset:hover {
+    background: rgba(140, 50, 50, 0.8);
+    border-color: #b06060;
+    color: #f4e4c8;
+}
+
 /* ==================== 뷰포트 (방의 한 면) ==================== */
 .viewport {
     position: fixed;
@@ -418,6 +437,52 @@ body {
     border-bottom: none;
 }
 
+/* 인벤토리 - 클릭 펼침 (v0.0.12) */
+.inventory .inv-item {
+    user-select: none;
+}
+
+.inventory .inv-name {
+    font-weight: 500;
+    color: #c4b498;
+    transition: color 0.15s;
+}
+
+.inventory .inv-item:hover .inv-name {
+    color: #e8c896;
+}
+
+.inventory .inv-desc {
+    max-height: 0;
+    overflow: hidden;
+    color: #80d480;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 16px;
+    transition: max-height 0.25s ease, padding-top 0.25s ease;
+    padding-top: 0;
+}
+
+.inventory .inv-item.open .inv-desc {
+    max-height: 50px;
+    padding-top: 6px;
+}
+
+.inventory .inv-item.open .inv-name {
+    color: #e8c896;
+}
+
+.inventory .inv-empty {
+    color: #604830;
+    font-style: italic;
+    text-align: center;
+    cursor: default;
+}
+
+.inventory .inv-empty:hover {
+    color: #604830;
+}
+
 /* ==================== AI 힌트 박스 ==================== */
 .hint-box {
     position: fixed;
@@ -488,6 +553,200 @@ body {
     font-size: 14px;
     color: #e8c896;
     min-width: 50px;
+}
+
+/* ==================== 주파수 게이지 (뒷벽 무전기 퍼즐) ==================== */
+.freq-display {
+    margin-top: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.freq-bar {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #604830;
+    margin-bottom: 12px;
+}
+
+.freq-fill {
+    position: absolute;
+    top: -3px;
+    width: 4px;
+    height: calc(100% + 6px);
+    background: #e8c896;
+    box-shadow: 0 0 8px rgba(232, 200, 150, 0.6);
+    transition: left 0.15s ease-out, background 0.2s;
+    transform: translateX(-50%);
+}
+
+.freq-fill.matched {
+    background: #80d480;
+    box-shadow: 0 0 16px rgba(128, 212, 128, 0.8);
+}
+
+/* 목표 영역 표시 (700 ± 30 = 670~730 = 65.5~71.4%) */
+.freq-target {
+    position: absolute;
+    left: 65.5%;
+    width: 5.9%;
+    top: 0;
+    height: 100%;
+    background: rgba(128, 212, 128, 0.2);
+    border-left: 1px dashed rgba(128, 212, 128, 0.5);
+    border-right: 1px dashed rgba(128, 212, 128, 0.5);
+}
+
+.freq-value-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #c4b498;
+    font-size: 13px;
+}
+
+.freq-label {
+    color: #806848;
+    letter-spacing: 1px;
+}
+
+.freq-value {
+    color: #e8c896;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==================== 모스 부호 퍼즐 (뒷벽) ==================== */
+.morse-display {
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #604830;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.morse-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.morse-label {
+    width: 50px;
+    font-size: 12px;
+    color: #806848;
+    letter-spacing: 2px;
+}
+
+.morse-pattern {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 32px;
+    padding: 4px 10px;
+    background: rgba(20, 14, 8, 0.5);
+    border: 1px solid #604830;
+}
+
+.morse-pattern.empty::before {
+    content: '입력 대기';
+    color: #604830;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.morse-pattern.flash {
+    animation: morse-flash 0.2s ease-out;
+}
+
+@keyframes morse-flash {
+    0%   { background: rgba(212, 160, 80, 0.4); }
+    100% { background: rgba(20, 14, 8, 0.5); }
+}
+
+.morse-dot {
+    color: #e8c896;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.morse-dash {
+    color: #e8c896;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.morse-empty {
+    color: #404030;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.morse-dot.pending,
+.morse-dash.pending {
+    color: #d4a050;
+}
+
+.morse-dot.correct,
+.morse-dash.correct {
+    color: #80d480;
+}
+
+.morse-dot.wrong,
+.morse-dash.wrong {
+    color: #d46060;
+}
+
+.morse-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.btn-morse {
+    background: rgba(40, 28, 16, 0.8);
+    border: 1px solid #604830;
+    color: #c4b498;
+    padding: 6px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.btn-morse:hover {
+    background: rgba(96, 72, 48, 0.8);
+    color: #f4e4c8;
+}
+
+.morse-status {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #c4b498;
+    min-height: 18px;
+}
+
+.morse-status.success {
+    color: #80d480;
+}
+
+.morse-status.error {
+    color: #d46060;
 }
 
 /* ==================== 망원경 (오른쪽 벽 퍼즐) ==================== */
@@ -659,4 +918,249 @@ body {
 /* ==================== 공통 ==================== */
 .hidden {
     display: none !important;
+}
+
+/* ==================== 모스 신호 듣기 (v0.0.12) ==================== */
+.morse-signal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.morse-signal {
+    flex: 1;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 14px;
+    background: rgba(20, 14, 8, 0.5);
+    border: 1px solid #604830;
+    justify-content: center;
+}
+
+.morse-tick {
+    color: #604830;
+    font-size: 28px;
+    line-height: 1;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.morse-tick.on {
+    color: #e8c896;
+    text-shadow: 0 0 12px rgba(232, 200, 150, 0.8);
+    animation: morse-tick-pop 0.3s ease-out;
+}
+
+@keyframes morse-tick-pop {
+    0%   { transform: scale(0.5); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.btn-morse:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-morse.ready {
+    border-color: #80a868;
+    color: #d0e8c0;
+    background: rgba(80, 160, 112, 0.2);
+}
+
+.btn-morse.ready:hover {
+    background: rgba(80, 160, 112, 0.4);
+}
+
+/* ==================== 숨겨진 단서 ==================== */
+.hidden-clue {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(20, 14, 8, 0.6);
+    border: 1px solid #604830;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.hidden-clue.reveal {
+    animation: clue-reveal 1.5s ease-out;
+}
+
+@keyframes clue-reveal {
+    0%   { opacity: 0; transform: scale(0.8); filter: blur(8px); }
+    50%  { opacity: 0.5; filter: blur(4px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+.clue-found {
+    color: #a08868;
+    font-size: 13px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.clue-digit {
+    font-size: 64px;
+    font-weight: 700;
+    color: #e8c896;
+    line-height: 1;
+    margin: 8px 0;
+    text-shadow: 0 0 16px rgba(232, 200, 150, 0.4);
+}
+
+.clue-meta {
+    color: #806848;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* ==================== 키패드 (앞벽 최종) ==================== */
+.keypad-container {
+    max-width: 240px;
+    margin: 12px auto 0;
+    padding: 14px;
+    background: rgba(20, 14, 8, 0.8);
+    border: 2px solid #604830;
+}
+
+/* 입력 슬롯 4개 */
+.keypad-slots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.keypad-slot {
+    width: 36px;
+    height: 42px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #604830;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #806848;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.keypad-slot.filled {
+    color: #e8c896;
+    border-color: #a08868;
+    background: rgba(40, 28, 16, 0.8);
+}
+
+.keypad-slot.correct {
+    color: #80d480;
+    border-color: #50a070;
+    background: rgba(80, 160, 112, 0.2);
+}
+
+.keypad-slot.shake {
+    animation: keypad-shake 0.4s ease-in-out;
+    border-color: #d46060;
+}
+
+@keyframes keypad-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(3px); }
+}
+
+/* 수집한 단서 미리보기 */
+.keypad-clues {
+    margin: 6px 0 10px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed #604830;
+    text-align: center;
+}
+
+.keypad-clues .clue-row {
+    display: flex;
+    justify-content: space-around;
+    margin: 1px 0;
+}
+
+.keypad-clues .clue-row span {
+    flex: 1;
+    color: #806848;
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.keypad-clues .clue-values span {
+    color: #e8c896;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0;
+}
+
+/* 키패드 버튼 그리드 */
+.keypad-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 6px;
+}
+
+.keypad-btn {
+    aspect-ratio: 1.4;
+    background: rgba(40, 28, 16, 0.9);
+    border: 1px solid #604830;
+    color: #e8c896;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.1s ease;
+}
+
+.keypad-btn:hover {
+    background: rgba(96, 72, 48, 0.9);
+    border-color: #a08868;
+}
+
+.keypad-btn:active {
+    transform: scale(0.95);
+    background: rgba(160, 136, 104, 0.6);
+}
+
+/* 상태 메시지 */
+.keypad-status {
+    text-align: center;
+    margin-top: 6px;
+    min-height: 16px;
+    color: #c4b498;
+    font-size: 12px;
+}
+
+.keypad-status.success {
+    color: #80d480;
+    font-weight: bold;
+}
+
+.keypad-status.error {
+    color: #d46060;
+}
+
+.keypad-status.warn {
+    color: #d4a050;
+}
+
+.keypad-hint {
+    text-align: center;
+    margin-top: 6px;
+    color: #604830;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
 }

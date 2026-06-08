@@ -18,12 +18,15 @@ const App = {
         this.bindDebugPanel();
         this.bindStateListeners();
         this.bindKeyboard();
+        this.bindHudResetButton();
         
         // 모듈 초기화
         Flashlight.init();
         LeftWallPuzzle.init();
         RightWallPuzzle.init();
         BackWallPuzzle.init();
+        MorsePuzzle.init();
+        HiddenClues.init();
         FrontWallPuzzle.init();
         
         // 서비스 이벤트 → GameState 반영
@@ -31,8 +34,81 @@ const App = {
             GameState.addHint(hint);
             this.showHint(hint);
         });
+
+        // 서버 연결 상태 표시
+        gameService.on('connection', (info) => {
+            this.updateConnectionStatus(info);
+        });
+
+        // 라파 입력 소스 상태 (status 메시지)
+        gameService.on('status', (data) => {
+            this.updateInputStatus(data);
+        });
+
+        // 명령 결과 (라파 미연결 등)
+        gameService.on('command_result', (msg) => {
+            if (!msg.ok) {
+                console.warn(`명령 실패 (${msg.command}): ${msg.reason}`);
+                // 화면에 표시할지 여부는 추후 결정 (지금은 콘솔만)
+            }
+        });
     },
-    
+
+    // ========================================================
+    // 연결 상태 UI 업데이트
+    // ========================================================
+    updateConnectionStatus(info) {
+        const el = document.getElementById('connection-text');
+        const dot = document.querySelector('.connection-status .status-dot');
+        const hudEl = document.getElementById('input-source');
+
+        if (el && dot) {
+            if (info.connected) {
+                el.textContent = '서버 연결됨 (실제 센서 대기 중)';
+                dot.className = 'status-dot connected';
+            } else {
+                el.textContent = 'Mock 모드 (서버 미연결, 디버그 슬라이더로 조작)';
+                dot.className = 'status-dot mock';
+            }
+        }
+
+        if (hudEl) {
+            hudEl.textContent = info.connected ? '서버' : 'Mock';
+        }
+    },
+
+    updateInputStatus(data) {
+        // data 예: {mode:"tcp", pi_connected:true, pi_addr:"192.168..."}
+        const el = document.getElementById('connection-text');
+        const hudEl = document.getElementById('input-source');
+
+        let lobbyText = '';
+        let hudText = '';
+
+        if (data.mode === 'tcp') {
+            if (data.pi_connected) {
+                lobbyText = `라파 연결됨 (${data.pi_addr || ''})`;
+                hudText = '라파';
+            } else {
+                lobbyText = '서버 연결됨 — 라파 대기 중';
+                hudText = '대기';
+            }
+        } else if (data.mode === 'serial') {
+            if (data.connected) {
+                lobbyText = `시리얼 직접 연결됨 (${data.port})`;
+                hudText = '시리얼';
+            } else {
+                lobbyText = '서버 연결됨 — 시리얼 미연결';
+                hudText = '대기';
+            }
+        } else {
+            return;
+        }
+
+        if (el) el.textContent = lobbyText;
+        if (hudEl) hudEl.textContent = hudText;
+    },
+
     // ========================================================
     // Lobby
     // ========================================================
@@ -56,10 +132,26 @@ const App = {
     // ========================================================
     bindEnd() {
         document.getElementById('restart-btn').addEventListener('click', () => {
-            this.stopTimer();
-            this.switchScreen('lobby-screen');
-            GameState.reset();
+            this.resetGame();
         });
+    },
+
+    // ========================================================
+    // 게임 리셋 (라파에도 명령 송신)
+    // ========================================================
+    resetGame() {
+        this.stopTimer();
+        // 라파에 restart 명령 (TCP 모드일 때만 실제로 전송됨)
+        gameService.sendRestart();
+        // 브라우저 GameState 초기화
+        GameState.reset();
+        // 모듈별 초기화
+        if (typeof HiddenClues !== 'undefined') HiddenClues.reset();
+        if (typeof MorsePuzzle !== 'undefined' && MorsePuzzle.reset) MorsePuzzle.reset();
+        if (typeof FrontWallPuzzle !== 'undefined' && FrontWallPuzzle.reset) FrontWallPuzzle.reset();
+        // 화면 전환
+        this.switchScreen('lobby-screen');
+        console.log('[Main] 게임 리셋 완료');
     },
     
     showEndScreen() {
@@ -120,17 +212,40 @@ const App = {
     // ========================================================
     // 키보드 단축키 (방향키)
     // ========================================================
+    // ========================================================
+    // HUD의 리셋 버튼
+    // ========================================================
+    bindHudResetButton() {
+        const btn = document.getElementById('hud-reset-btn');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            if (confirm('게임을 리셋하고 처음으로 돌아갈까요?')) {
+                this.resetGame();
+            }
+        });
+    },
+
     bindKeyboard() {
         document.addEventListener('keydown', (e) => {
+            // ESC: 게임 중 리셋 (어느 화면에서든 동작)
+            if (e.key === 'Escape') {
+                if (GameState.phase === 'playing') {
+                    if (confirm('게임을 리셋하고 처음으로 돌아갈까요?')) {
+                        this.resetGame();
+                    }
+                }
+                return;
+            }
+
             if (GameState.phase !== 'playing') return;
-            
+
             const keyMap = {
                 'ArrowUp': 'up',
                 'ArrowDown': 'down',
                 'ArrowLeft': 'left',
                 'ArrowRight': 'right'
             };
-            
+
             if (keyMap[e.key]) {
                 e.preventDefault();
                 this.changeView(keyMap[e.key]);
@@ -169,12 +284,29 @@ const App = {
     // GameState 리스너 (UI 동기화)
     // ========================================================
     bindStateListeners() {
-        // 인벤토리 변경
+        // 인벤토리 변경 - 클릭하면 단서 내용 펼침
         GameState.on('inventory', (items) => {
             const list = document.getElementById('inventory-list');
-            list.innerHTML = items.map(item => 
-                `<li title="${item.description}">• ${item.name}</li>`
-            ).join('');
+            if (!list) return;
+
+            if (items.length === 0) {
+                list.innerHTML = '<li class="inv-empty">아직 단서가 없다.</li>';
+                return;
+            }
+
+            list.innerHTML = items.map((item, i) => `
+                <li class="inv-item" data-idx="${i}">
+                    <div class="inv-name">▸ ${item.name}</div>
+                    <div class="inv-desc">${item.description}</div>
+                </li>
+            `).join('');
+
+            // 클릭으로 펼침/접힘 토글
+            list.querySelectorAll('.inv-item').forEach((li) => {
+                li.addEventListener('click', () => {
+                    li.classList.toggle('open');
+                });
+            });
         });
         
         // 전력 상태 표시
@@ -253,9 +385,7 @@ const App = {
         });
         
         document.getElementById('force-restart').addEventListener('click', () => {
-            this.stopTimer();
-            GameState.reset();
-            this.switchScreen('lobby-screen');
+            this.resetGame();
         });
         
         // 상태 실시간 표시

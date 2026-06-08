@@ -36,11 +36,18 @@ const LeftWallPuzzle = {
     },
     
     update(temp) {
-        // 온도 게이지 표시 (-10 ~ 50 → 0 ~ 100%)
-        const percent = Math.max(0, Math.min(100, ((temp + 10) / 60) * 100));
+        // 온도 게이지 표시
+        // 게이지 범위를 20~30°C로 좁혀서 변화가 잘 보이게 함
+        //   - 20°C 이하: 0%
+        //   - 25°C:      50%
+        //   - 30°C 이상: 100% (목표 도달)
+        const GAUGE_MIN = 20;
+        const GAUGE_MAX = this.TARGET_TEMP;  // 30
+        const range = GAUGE_MAX - GAUGE_MIN;
+        const percent = Math.max(0, Math.min(100, ((temp - GAUGE_MIN) / range) * 100));
         this.tempFill.style.width = percent + '%';
         this.tempValue.textContent = temp.toFixed(1) + '°C';
-        
+
         // 목표 도달 시 클리어
         if (temp >= this.TARGET_TEMP && !GameState.puzzles.leftWall.solved) {
             this.solve();

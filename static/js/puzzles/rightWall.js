@@ -8,21 +8,22 @@
  */
 
 const RightWallPuzzle = {
-    TARGET_DISTANCE: 20,
-    DISTANCE_TOLERANCE: 5,   // ±5cm 허용
+    TARGET_DISTANCE: 25,
+    DISTANCE_TOLERANCE: 3,   // ±3cm 허용 (25cm 근처 22~28에서 해제)
     REVEALED_DIGIT: '3',     // 망원경으로 보이는 암호 숫자
-    
+
     puzzleArea: null,
     blurEl: null,
-    
+
     init() {
         this.puzzleArea = document.getElementById('telescope-puzzle');
         this.blurEl = document.getElementById('telescope-blur');
-        
+
         GameState.on('sensor', ({ name, value }) => {
-            if (name === 'distance') this.update(value);
+            // 라파/아두이노가 보내는 센서 이름은 'dist' (DIST=18 → dist)
+            if (name === 'dist') this.update(value);
         });
-        
+
         GameState.on('view', (view) => this.handleViewChange(view));
     },
     
@@ -37,11 +38,11 @@ const RightWallPuzzle = {
     
     update(distance) {
         // 거리에 따라 블러 강도 조절
-        // 목표 거리(20cm)에서 멀어질수록 블러 ↑
+        // 목표 거리(25cm)에서 멀어질수록 블러 ↑
         const diff = Math.abs(distance - this.TARGET_DISTANCE);
-        const blurAmount = Math.min(15, diff * 0.8);
+        const blurAmount = Math.min(15, diff * 0.6);
         this.blurEl.style.filter = `blur(${blurAmount}px)`;
-        
+
         // 허용 범위 내면 클리어
         if (diff <= this.DISTANCE_TOLERANCE && !GameState.puzzles.rightWall.solved) {
             this.solve();
@@ -56,7 +57,7 @@ const RightWallPuzzle = {
         GameState.addToInventory({
             id: 'telescope_digit',
             name: '망원경 단서',
-            description: `암호의 한 자리: ${this.REVEALED_DIGIT}`
+            description: `2번 자리: ${this.REVEALED_DIGIT}`
         });
         
         this.puzzleArea.innerHTML = `

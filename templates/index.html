@@ -44,21 +44,46 @@
                 <span class="hud-label">전력</span>
                 <span id="power-status" class="hud-value">차단됨</span>
             </div>
+            <div class="hud-item">
+                <span class="hud-label">입력</span>
+                <span id="input-source" class="hud-value">Mock</span>
+            </div>
+            <button id="hud-reset-btn" class="hud-reset" title="게임 리셋 (ESC)">
+                ⟲ 리셋
+            </button>
         </div>
 
         <!-- 메인 뷰포트 (방의 한 면 표시) -->
         <div id="viewport" class="viewport">
             
-            <!-- 정면 (앞벽) - 출구 -->
+            <!-- 정면 (앞벽) - 출구 + 키패드 -->
             <div class="wall front-wall active" data-view="front">
-                <div class="wall-image" 
+                <div class="wall-image"
                      style="background-image: url('/static/images/walls/front_wall.png');">
                     <span class="img-placeholder">앞벽 - 잠긴 출구</span>
                 </div>
                 <div class="wall-content">
                     <div id="exit-panel" class="exit-panel hidden">
-                        <p class="puzzle-text">최종 탈출구</p>
-                        <p class="hint-text">모든 퍼즐을 해결하면 열립니다.</p>
+                        <p class="puzzle-text">출구 키패드</p>
+                        <p class="hint-text">4자리 암호를 입력하라.</p>
+
+                        <div class="keypad-container">
+                            <!-- 입력 슬롯 4칸 -->
+                            <div id="keypad-slots" class="keypad-slots"></div>
+
+                            <!-- 수집한 단서 미리보기 -->
+                            <div id="keypad-clues" class="keypad-clues"></div>
+
+                            <!-- 버튼 그리드 (4x3) -->
+                            <div id="keypad-buttons" class="keypad-buttons"></div>
+
+                            <!-- 상태 메시지 -->
+                            <p id="keypad-status" class="keypad-status"></p>
+
+                            <p class="keypad-hint">
+                                * = 지우기,  # = 확인,  키보드 0~9 / Backspace / Enter 도 가능
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -73,14 +98,36 @@
                     <!-- 무전기 퍼즐 영역 -->
                     <div id="radio-puzzle" class="puzzle-area hidden">
                         <p class="puzzle-text">낡은 무전기에서 잡음이 들린다.</p>
+                        <p class="hint-text">주파수를 맞춰보자. (가변저항 돌리기)</p>
+                        <div class="freq-display">
+                            <div class="freq-bar">
+                                <div id="freq-fill" class="freq-fill" style="left: 0%"></div>
+                                <div class="freq-target"></div>
+                            </div>
+                            <div class="freq-value-row">
+                                <span class="freq-label">현재</span>
+                                <span id="freq-value" class="freq-value">---</span>
+                                <span class="freq-label">/ 목표 700</span>
+                            </div>
+                        </div>
                     </div>
                     <!-- 모스 퍼즐 영역 -->
                     <div id="morse-puzzle" class="puzzle-area hidden">
-                        <p class="puzzle-text">모스 신호가 들어온다.</p>
-                    </div>
-                    <!-- 키패드 퍼즐 영역 -->
-                    <div id="keypad-puzzle" class="puzzle-area hidden">
-                        <p class="puzzle-text">최종 암호를 입력하라.</p>
+                        <p class="puzzle-text">잡음 사이로 신호가 들린다.</p>
+                        <p class="hint-text">몇 번 울리는지 잘 들어라. 이게 단서다.</p>
+
+                        <div class="morse-display">
+                            <div class="morse-signal-row">
+                                <span class="morse-label">수신</span>
+                                <div id="morse-signal-display" class="morse-signal"></div>
+                            </div>
+
+                            <div class="morse-controls">
+                                <button id="morse-play-btn" class="btn-morse">▶ 다시 듣기</button>
+                                <button id="morse-confirm-btn" class="btn-morse" disabled>✓ 들었다</button>
+                            </div>
+                            <p id="morse-status" class="morse-status">신호 대기...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,6 +148,12 @@
                             </div>
                             <span id="temp-value">0°C</span>
                         </div>
+                    </div>
+                    <!-- 전력 복구 후 자동으로 발견되는 숨겨진 단서 -->
+                    <div id="left-wall-clue" class="hidden-clue hidden">
+                        <p class="clue-found">벽 한쪽에 작게 새겨진 흔적을 발견했다...</p>
+                        <div class="clue-digit">1</div>
+                        <p class="clue-meta">1번 자리</p>
                     </div>
                 </div>
             </div>
@@ -130,7 +183,14 @@
                     <span class="img-placeholder">천장 - 꺼진 전구들</span>
                 </div>
                 <div class="wall-content">
-                    <p class="puzzle-text">어두운 천장. 무언가 적혀있는 것 같다.</p>
+                    <!-- 전력 복구 전: 어두워서 안 보임 -->
+                    <p id="ceiling-dark-msg" class="puzzle-text">어두운 천장. 아무것도 보이지 않는다.</p>
+                    <!-- 전력 복구 후 자동으로 발견되는 숨겨진 단서 -->
+                    <div id="ceiling-clue" class="hidden-clue hidden">
+                        <p class="clue-found">불이 들어오자 천장에 적힌 숫자가 드러났다.</p>
+                        <div class="clue-digit">7</div>
+                        <p class="clue-meta">4번 자리</p>
+                    </div>
                 </div>
             </div>
 
@@ -243,6 +303,8 @@
     <script src="/static/js/puzzles/leftWall.js"></script>
     <script src="/static/js/puzzles/rightWall.js"></script>
     <script src="/static/js/puzzles/backWall.js"></script>
+    <script src="/static/js/puzzles/morse.js"></script>
+    <script src="/static/js/puzzles/hiddenClues.js"></script>
     <script src="/static/js/puzzles/frontWall.js"></script>
     <script src="/static/js/main.js"></script>
 </body>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SensorEscape - 연결 테스트</title>
+    <link rel="stylesheet" href="/static/css/test.css">
+</head>
+<body>
+    <div class="test-container">
+
+        <header class="test-header">
+            <h1>SENSOR ESCAPE</h1>
+            <p class="subtitle">아두이노 연결 테스트</p>
+            <a href="/" class="back-link">← 메인 게임으로</a>
+        </header>
+
+        <!-- 연결 상태 카드 -->
+        <section class="status-grid">
+
+            <div class="status-card">
+                <div class="status-label">WebSocket</div>
+                <div id="ws-status" class="status-value">
+                    <span class="dot disconnected"></span>
+                    <span class="text">연결 중...</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-label">시리얼 포트 / 라파</div>
+                <div id="serial-status" class="status-value">
+                    <span class="dot disconnected"></span>
+                    <span class="text">대기 중</span>
+                </div>
+                <div id="serial-port" class="status-sub">-</div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-label">마지막 수신</div>
+                <div id="last-received" class="status-value">
+                    <span class="text">없음</span>
+                </div>
+                <div id="last-time" class="status-sub">-</div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-label">총 수신 횟수</div>
+                <div id="msg-count" class="status-value">
+                    <span class="text big">0</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 센서 카드 (★ 새로 추가) -->
+        <section class="sensor-section">
+            <h2 class="section-title">센서 실시간 모니터링</h2>
+            <div class="sensor-grid">
+
+                <div class="sensor-card" data-sensor="cds">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">CDS</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">조도 (0~1023)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+                <div class="sensor-card" data-sensor="snd">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">SND</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">사운드 (0~1023)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+                <div class="sensor-card" data-sensor="pot">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">POT</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">가변저항 (0~1023)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+                <div class="sensor-card" data-sensor="temp">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">TEMP</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">온도 (°C)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+                <div class="sensor-card" data-sensor="hum">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">HUM</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">습도 (%)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+                <div class="sensor-card" data-sensor="dist">
+                    <div class="sensor-header">
+                        <span class="sensor-dot offline"></span>
+                        <span class="sensor-name">DIST</span>
+                    </div>
+                    <div class="sensor-value">--</div>
+                    <div class="sensor-meta">거리 (cm)</div>
+                    <div class="sensor-time">대기 중</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 게임 이벤트 (★ 새로 추가) -->
+        <section class="event-section">
+            <div class="event-header">
+                <h2 class="section-title">게임 상태</h2>
+                <div class="event-controls">
+                    <button id="btn-start-game" class="btn btn-event">게임 시작</button>
+                    <button id="btn-restart" class="btn btn-event btn-warn">게임 리셋</button>
+                    <button id="btn-request-state" class="btn btn-event">상태 요청</button>
+                </div>
+            </div>
+            <div class="event-grid">
+
+                <div class="event-card" id="event-flashlight">
+                    <div class="event-label">손전등</div>
+                    <div class="event-value">OFF</div>
+                </div>
+
+                <div class="event-card" id="event-power">
+                    <div class="event-label">전력</div>
+                    <div class="event-value">차단</div>
+                </div>
+
+                <div class="event-card" id="event-stage">
+                    <div class="event-label">현재 단계</div>
+                    <div class="event-value">-</div>
+                </div>
+
+                <div class="event-card" id="event-puzzles">
+                    <div class="event-label">해결한 퍼즐</div>
+                    <div class="event-value">0개</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 메시지 로그 -->
+        <section class="log-section">
+            <div class="log-header">
+                <h2 class="section-title">수신 로그</h2>
+                <div class="log-controls">
+                    <button id="clear-log" class="btn">로그 지우기</button>
+                    <label class="auto-scroll">
+                        <input type="checkbox" id="auto-scroll" checked>
+                        자동 스크롤
+                    </label>
+                </div>
+            </div>
+            <div id="log" class="log-area">
+                <div class="log-placeholder">아두이노 메시지가 여기에 표시됩니다...</div>
+            </div>
+        </section>
+
+        <!-- 도움말 -->
+        <section class="help-section">
+            <h3>실행 방법</h3>
+            <ol>
+                <li>아두이노에 <code>sensor_check.ino</code> 업로드 + USB로 라파에 연결</li>
+                <li>노트북: <code>$env:INPUT_MODE="tcp"; python main.py</code></li>
+                <li>라파: <code>cd raspberry && python3 main.py</code></li>
+                <li>이 페이지 새로고침</li>
+                <li>WebSocket: 연결됨 ✓ / 라파 연결됨 ✓ / 6개 센서 카드 모두 초록색이면 성공</li>
+            </ol>
+
+            <h3>문제 해결</h3>
+            <ul>
+                <li><strong>WebSocket 연결 안 됨</strong> → 노트북 서버 실행 확인</li>
+                <li><strong>라파 미연결</strong> → 라파의 <code>config.py</code>에서 SERVER_HOST 확인, 노트북 방화벽 9000 포트 허용</li>
+                <li><strong>특정 센서만 회색</strong> → 그 센서 배선 확인 (아두이노 시리얼 모니터에서 출력 확인)</li>
+                <li><strong>이상한 값</strong> → 아두이노 코드의 baud rate가 9600인지 확인</li>
+            </ul>
+        </section>
+
+    </div>
+
+    <script src="/static/js/test.js"></script>
+</body>
+</html>

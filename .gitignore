@@ -1,0 +1,29 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 가상환경
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 로그/임시
+*.log
+*.tmp
+
+# 빌드 산출물
+node_modules/
+dist/
+build/
