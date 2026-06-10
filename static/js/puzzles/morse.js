@@ -169,13 +169,15 @@ const MorsePuzzle = {
             description: `3번 자리: ${this.SIGNAL_COUNT}`
         });
 
-        if (this.statusEl) {
-            this.statusEl.textContent =
-                `✓ 단서 획득: 3번 자리는 ${this.SIGNAL_COUNT}`;
-            this.statusEl.classList.add('success');
-        }
-        if (this.confirmBtn) {
-            this.confirmBtn.disabled = true;
+        // 퍼즐 영역을 큰 단서 박스로 교체
+        if (this.puzzleArea) {
+            this.puzzleArea.innerHTML = `
+                <div class="hidden-clue reveal">
+                    <p class="clue-found">신호가 ${this.SIGNAL_COUNT}번 울렸다...</p>
+                    <div class="clue-digit">${this.SIGNAL_COUNT}</div>
+                    <p class="clue-meta">3번 자리</p>
+                </div>
+            `;
         }
         console.log('[Morse] 단서 부여 완료 (3번 자리 = ' + this.SIGNAL_COUNT + ')');
     },

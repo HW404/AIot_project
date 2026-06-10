@@ -66,6 +66,12 @@ const GameState = {
         if (restored) {
             this.flashlightOn = false;
         }
+        // v0.0.18: body 클래스로 CSS에서 dark-msg 강제 숨김
+        if (restored) {
+            document.body.classList.add('power-restored');
+        } else {
+            document.body.classList.remove('power-restored');
+        }
         this._notify('power', restored);
     },
     
@@ -113,6 +119,8 @@ const GameState = {
         this.currentView = 'front';
         this.powerRestored = false;
         this.flashlightOn = false;
+        // v0.0.18: 리셋 시 body 클래스 제거
+        document.body.classList.remove('power-restored');
         this.startTime = null;
         this.elapsedSeconds = 0;
         this.inventory = [];

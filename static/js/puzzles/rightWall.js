@@ -28,8 +28,9 @@ const RightWallPuzzle = {
     },
     
     handleViewChange(view) {
-        // 전력 복구 후에만 망원경 퍼즐 활성화 (어두우면 못 봄)
-        if (view === 'right' && GameState.powerRestored && !GameState.puzzles.rightWall.solved) {
+        // 전력 복구 후에만 활성. 클리어 여부와 관계없이 우측에 오면 표시
+        // (클리어 후엔 puzzleArea가 단서 박스로 교체되어 있음)
+        if (view === 'right' && GameState.powerRestored) {
             this.puzzleArea.classList.remove('hidden');
         } else {
             this.puzzleArea.classList.add('hidden');
@@ -61,13 +62,11 @@ const RightWallPuzzle = {
         });
         
         this.puzzleArea.innerHTML = `
-            <p class="puzzle-text" style="color: #80d480;">
-                ✓ 암호판이 선명해졌다.
-            </p>
-            <p class="puzzle-text">
-                보이는 숫자: <span style="font-size: 32px; color: #e8c896;">${this.REVEALED_DIGIT}</span>
-            </p>
-            <p class="hint-text">단서가 인벤토리에 추가되었다.</p>
+            <div class="hidden-clue reveal">
+                <p class="clue-found">망원경의 초점이 맞춰지자 숫자가 선명해졌다...</p>
+                <div class="clue-digit">${this.REVEALED_DIGIT}</div>
+                <p class="clue-meta">2번 자리</p>
+            </div>
         `;
     }
 };

@@ -48,6 +48,9 @@
                 <span class="hud-label">입력</span>
                 <span id="input-source" class="hud-value">Mock</span>
             </div>
+            <button id="hud-sensor-guide-btn" class="hud-sensor-guide" title="센서 가이드">
+                📷 센서
+            </button>
             <button id="hud-reset-btn" class="hud-reset" title="게임 리셋 (ESC)">
                 ⟲ 리셋
             </button>
@@ -63,26 +66,40 @@
                     <span class="img-placeholder">앞벽 - 잠긴 출구</span>
                 </div>
                 <div class="wall-content">
+                    <!-- 전력 복구 전: 어두워서 안 보임 -->
+                    <p class="dark-msg puzzle-text" data-dark-for="front">
+                        어두워서 아무것도 보이지 않는다.
+                    </p>
                     <div id="exit-panel" class="exit-panel hidden">
-                        <p class="puzzle-text">출구 키패드</p>
-                        <p class="hint-text">4자리 암호를 입력하라.</p>
+                        <!-- 단서 부족 시 표시 -->
+                        <div id="keypad-locked" class="keypad-locked">
+                            <p class="puzzle-text">출구 키패드</p>
+                            <p class="locked-msg">아직 단서가 부족하다.</p>
+                            <p class="locked-progress" id="keypad-progress">단서 0 / 4</p>
+                        </div>
 
-                        <div class="keypad-container">
-                            <!-- 입력 슬롯 4칸 -->
-                            <div id="keypad-slots" class="keypad-slots"></div>
+                        <!-- 단서 4개 다 모이면 표시 -->
+                        <div id="keypad-unlocked" class="keypad-unlocked hidden">
+                            <p class="puzzle-text">출구 키패드</p>
+                            <p class="hint-text">4자리 암호를 입력하라.</p>
 
-                            <!-- 수집한 단서 미리보기 -->
-                            <div id="keypad-clues" class="keypad-clues"></div>
+                            <div class="keypad-container">
+                                <!-- 입력 슬롯 4칸 -->
+                                <div id="keypad-slots" class="keypad-slots"></div>
 
-                            <!-- 버튼 그리드 (4x3) -->
-                            <div id="keypad-buttons" class="keypad-buttons"></div>
+                                <!-- 수집한 단서 미리보기 -->
+                                <div id="keypad-clues" class="keypad-clues"></div>
 
-                            <!-- 상태 메시지 -->
-                            <p id="keypad-status" class="keypad-status"></p>
+                                <!-- 버튼 그리드 (4x3) -->
+                                <div id="keypad-buttons" class="keypad-buttons"></div>
 
-                            <p class="keypad-hint">
-                                * = 지우기,  # = 확인,  키보드 0~9 / Backspace / Enter 도 가능
-                            </p>
+                                <!-- 상태 메시지 -->
+                                <p id="keypad-status" class="keypad-status"></p>
+
+                                <p class="keypad-hint">
+                                    * = 지우기,  # = 확인,  키보드 0~9 / Backspace / Enter 도 가능
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,9 +112,16 @@
                     <span class="img-placeholder">뒷벽 - 무전기 & 작업대</span>
                 </div>
                 <div class="wall-content">
+                    <!-- 전력 복구 전: 어두워서 안 보임 -->
+                    <p class="dark-msg puzzle-text" data-dark-for="back">
+                        어두워서 아무것도 보이지 않는다.
+                    </p>
                     <!-- 무전기 퍼즐 영역 -->
                     <div id="radio-puzzle" class="puzzle-area hidden">
-                        <p class="puzzle-text">낡은 무전기에서 잡음이 들린다.</p>
+                        <p class="puzzle-text">
+                            낡은 무전기에서 잡음이 들린다.
+                            <button class="hint-btn" data-hint="pot" title="힌트">?</button>
+                        </p>
                         <p class="hint-text">주파수를 맞춰보자. (가변저항 돌리기)</p>
                         <div class="freq-display">
                             <div class="freq-bar">
@@ -134,13 +158,26 @@
 
             <!-- 좌측 벽 - 전선 패널 -->
             <div class="wall left-wall" data-view="left">
-                <div class="wall-image" 
+                <div id="left-wall-image" class="wall-image left-wall-image"
                      style="background-image: url('/static/images/walls/left_wall.png');">
                     <span class="img-placeholder">왼쪽벽 - 냉각 전선 패널</span>
                 </div>
+                <!-- 전력 복구 후 페이드인되는 녹은 배경 -->
+                <div id="left-wall-image-thawed" class="wall-image left-wall-thawed hidden"
+                     style="background-image: url('/static/images/walls/left_wall_thawed.png');">
+                </div>
                 <div class="wall-content">
+                    <!-- 1단계: 처음 진입 시 어렴풋이 보임 -->
+                    <p id="left-wall-cold-msg" class="dark-msg puzzle-text">
+                        무언가 차갑게 얼어 있다.
+                        <button class="hint-btn" data-hint="temp" title="힌트">?</button>
+                    </p>
+                    <!-- 2단계: 온도가 변하기 시작하면 퍼즐 UI 등장 -->
                     <div id="cable-puzzle" class="puzzle-area hidden">
-                        <p class="puzzle-text">전선 패널이 꽁꽁 얼어붙어 있다.</p>
+                        <p class="puzzle-text">
+                            전선 패널이 꽁꽁 얼어붙어 있다.
+                            <button class="hint-btn" data-hint="temp" title="힌트">?</button>
+                        </p>
                         <p class="hint-text">체온을 가해 녹여야 한다.</p>
                         <div class="temp-gauge-container">
                             <div class="temp-gauge">
@@ -165,11 +202,17 @@
                     <span class="img-placeholder">오른쪽벽 - 망원경 & 암호판</span>
                 </div>
                 <div class="wall-content">
+                    <!-- 전력 복구 전: 어두워서 안 보임 -->
+                    <p class="dark-msg puzzle-text" data-dark-for="right">
+                        어두워서 아무것도 보이지 않는다.
+                    </p>
                     <div id="telescope-puzzle" class="puzzle-area hidden">
-                        <p class="puzzle-text">망원경 초점이 맞지 않아 흐릿하다.</p>
+                        <p class="puzzle-text">
+                            망원경 초점이 맞지 않아 흐릿하다.
+                            <button class="hint-btn" data-hint="dist" title="힌트">?</button>
+                        </p>
                         <div class="telescope-view">
                             <div id="telescope-blur" class="telescope-blur">
-                                <span class="img-placeholder">암호판 이미지</span>
                             </div>
                         </div>
                     </div>
@@ -184,10 +227,10 @@
                 </div>
                 <div class="wall-content">
                     <!-- 전력 복구 전: 어두워서 안 보임 -->
-                    <p id="ceiling-dark-msg" class="puzzle-text">어두운 천장. 아무것도 보이지 않는다.</p>
+                    <p id="ceiling-dark-msg" class="dark-msg puzzle-text">어두워서 아무것도 보이지 않는다.</p>
                     <!-- 전력 복구 후 자동으로 발견되는 숨겨진 단서 -->
                     <div id="ceiling-clue" class="hidden-clue hidden">
-                        <p class="clue-found">불이 들어오자 천장에 적힌 숫자가 드러났다.</p>
+                        <p class="clue-found">천장 한쪽에 작은 메모를 발견했다...</p>
                         <div class="clue-digit">7</div>
                         <p class="clue-meta">4번 자리</p>
                     </div>
@@ -199,6 +242,22 @@
         <!-- 손전등 오버레이 (전력 복구 전에만 활성) -->
         <div id="flashlight-overlay" class="flashlight-overlay">
             <div id="flashlight-circle" class="flashlight-circle hidden"></div>
+            <!-- 손전등 켜기 전 안내 (켜지면 자동 숨김) -->
+            <p id="flashlight-prompt" class="flashlight-prompt">
+                너무 어둡다. 손전등을 켜야겠어...
+            </p>
+        </div>
+
+        <!-- 센서 힌트 모달 -->
+        <div id="hint-modal" class="hint-modal hidden">
+            <div class="hint-modal-content">
+                <button class="hint-modal-close" id="hint-modal-close">✕</button>
+                <h3 id="hint-modal-title">힌트</h3>
+                <div class="hint-modal-image-wrap">
+                    <img id="hint-modal-image" src="" alt="센서">
+                </div>
+                <p id="hint-modal-text"></p>
+            </div>
         </div>
 
         <!-- 시점 전환 컨트롤 -->
@@ -306,6 +365,8 @@
     <script src="/static/js/puzzles/morse.js"></script>
     <script src="/static/js/puzzles/hiddenClues.js"></script>
     <script src="/static/js/puzzles/frontWall.js"></script>
+    <script src="/static/js/hintModal.js"></script>
+    <script src="/static/js/darkOverlay.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>

@@ -31,6 +31,9 @@ const FrontWallPuzzle = {
     inputBuffer: '',
     attempts: 0,
     locked: false,        // 정답 후 입력 차단
+    lockedEl: null,       // 단서 부족 메시지 영역
+    unlockedEl: null,     // 키패드 영역
+    progressEl: null,     // 진행도 텍스트
 
     init() {
         this.exitPanel = document.getElementById('exit-panel');
@@ -38,6 +41,9 @@ const FrontWallPuzzle = {
         this.slotsEl = document.getElementById('keypad-slots');
         this.statusEl = document.getElementById('keypad-status');
         this.clueListEl = document.getElementById('keypad-clues');
+        this.lockedEl = document.getElementById('keypad-locked');
+        this.unlockedEl = document.getElementById('keypad-unlocked');
+        this.progressEl = document.getElementById('keypad-progress');
 
         if (!this.exitPanel) return;
 
@@ -54,18 +60,67 @@ const FrontWallPuzzle = {
             }
         });
 
-        // 단서 추가될 때마다 힌트 영역 갱신
-        GameState.on('inventory', () => this.renderClues());
+        // 단서 추가될 때마다 힌트 영역 갱신 + 키패드 잠금 상태 갱신
+        GameState.on('inventory', () => {
+            this.renderClues();
+            this.updateLockState();
+            this.ensureVisibility();
+        });
+
+        // 다른 퍼즐 해결 / 전력 변경 시도 정면이면 패널 살아있게
+        GameState.on('puzzleSolved', () => this.ensureVisibility());
+        GameState.on('power', () => this.ensureVisibility());
 
         // 키보드 단축키
         document.addEventListener('keydown', (e) => this.handleKey(e));
 
-        // 초기 힌트 렌더
+        // 초기 힌트 렌더 + 잠금 상태
         this.renderClues();
+        this.updateLockState();
+    },
+
+    // 단서 4개 모이면 키패드 잠금 해제, 아니면 "단서 부족" 표시
+    updateLockState() {
+        if (!this.lockedEl || !this.unlockedEl) return;
+
+        // 위치 단서 개수 카운트 (description에 "N번 자리:" 패턴이 있는 것만)
+        const items = GameState.inventory || [];
+        const positions = new Set();
+        items.forEach((item) => {
+            const m = item.description && item.description.match(/(\d)번 자리:\s*(\d)/);
+            if (m) positions.add(m[1]);
+        });
+        const count = positions.size;
+
+        if (this.progressEl) {
+            this.progressEl.textContent = `단서 ${count} / 4`;
+        }
+
+        if (count >= 4) {
+            // 잠금 해제
+            this.lockedEl.classList.add('hidden');
+            this.unlockedEl.classList.remove('hidden');
+        } else {
+            // 단서 부족
+            this.lockedEl.classList.remove('hidden');
+            this.unlockedEl.classList.add('hidden');
+        }
+    },
+
+    // 정면 시점일 때 키패드 패널 강제 표시
+    // (다른 퍼즐 해결 등으로 어떤 이유든 숨겨졌을 때 복구)
+    // v0.0.16: 전력 복구 후 + 정면일 때만 표시
+    ensureVisibility() {
+        if (!this.exitPanel) return;
+        if (GameState.currentView === 'front' && GameState.powerRestored) {
+            this.exitPanel.classList.remove('hidden');
+        } else {
+            this.exitPanel.classList.add('hidden');
+        }
     },
 
     handleViewChange(view) {
-        if (view === 'front') {
+        if (view === 'front' && GameState.powerRestored) {
             this.exitPanel.classList.remove('hidden');
         } else {
             this.exitPanel.classList.add('hidden');
@@ -258,5 +313,6 @@ const FrontWallPuzzle = {
         this.renderSlots();
         this.clearStatus();
         this.renderClues();
+        this.updateLockState();
     }
 };

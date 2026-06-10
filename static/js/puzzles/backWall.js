@@ -45,20 +45,24 @@ const BackWallPuzzle = {
         if (view !== 'back') {
             this.radioEl.classList.add('hidden');
             this.morseEl.classList.add('hidden');
-            this.keypadEl.classList.add('hidden');
+            if (this.keypadEl) this.keypadEl.classList.add('hidden');
             return;
         }
 
         // 전력 복구 안 되면 뒷벽 퍼즐 비활성
         if (!GameState.powerRestored) return;
 
-        // 진행 단계에 따라 표시
+        // 단계별 표시
         if (!GameState.puzzles.backWall_radio.solved) {
+            // 무전기 단계
             this.radioEl.classList.remove('hidden');
-        } else if (!GameState.puzzles.backWall_morse.solved) {
+            this.morseEl.classList.add('hidden');
+        } else {
+            // 무전기 해결 후: 모스 영역 (해결 전이든 후든)
+            // morse.js가 클리어 시 puzzleArea를 큰 단서 박스로 교체하므로
+            // 항상 보이게 두면 됨
+            this.radioEl.classList.add('hidden');
             this.morseEl.classList.remove('hidden');
-        } else if (!GameState.puzzles.backWall_keypad.solved) {
-            this.keypadEl.classList.remove('hidden');
         }
     },
 

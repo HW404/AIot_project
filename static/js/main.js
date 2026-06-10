@@ -28,6 +28,8 @@ const App = {
         MorsePuzzle.init();
         HiddenClues.init();
         FrontWallPuzzle.init();
+        HintModal.init();
+        DarkOverlay.init();
         
         // 서비스 이벤트 → GameState 반영
         gameService.on('hint', (hint) => {
@@ -148,6 +150,7 @@ const App = {
         // 모듈별 초기화
         if (typeof HiddenClues !== 'undefined') HiddenClues.reset();
         if (typeof MorsePuzzle !== 'undefined' && MorsePuzzle.reset) MorsePuzzle.reset();
+        if (typeof LeftWallPuzzle !== 'undefined' && LeftWallPuzzle.reset) LeftWallPuzzle.reset();
         if (typeof FrontWallPuzzle !== 'undefined' && FrontWallPuzzle.reset) FrontWallPuzzle.reset();
         // 화면 전환
         this.switchScreen('lobby-screen');
@@ -207,6 +210,20 @@ const App = {
         document.getElementById('current-view-label').textContent = labels[newView];
         
         GameState.setView(newView);
+
+        // v0.0.18: 천장 진입 시 HiddenClues 직접 호출 (이벤트 누락 대비)
+        if (newView === 'ceiling' && GameState.powerRestored) {
+            if (typeof HiddenClues !== 'undefined') {
+                console.log('[Main] changeView에서 직접 HiddenClues 호출');
+                HiddenClues.handleViewChange('ceiling');
+            }
+        }
+        // 좌측도 마찬가지
+        if (newView === 'left' && GameState.powerRestored) {
+            if (typeof HiddenClues !== 'undefined') {
+                HiddenClues.handleViewChange('left');
+            }
+        }
     },
     
     // ========================================================
@@ -352,11 +369,12 @@ const App = {
         });
         
         // 슬라이더 → 센서값 동기화
+        // v0.0.18: 센서 이름을 새 키(dist, pot)로 정정
         const sliders = [
             { id: 'sim-cds', sensor: 'cds' },
             { id: 'sim-temp', sensor: 'temp' },
-            { id: 'sim-distance', sensor: 'distance' },
-            { id: 'sim-potentiometer', sensor: 'potentiometer' }
+            { id: 'sim-distance', sensor: 'dist' },
+            { id: 'sim-potentiometer', sensor: 'pot' }
         ];
         
         sliders.forEach(({ id, sensor }) => {
