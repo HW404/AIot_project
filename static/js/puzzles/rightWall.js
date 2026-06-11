@@ -9,43 +9,61 @@
 
 const RightWallPuzzle = {
     TARGET_DISTANCE: 25,
-    DISTANCE_TOLERANCE: 3,   // ±3cm 허용 (25cm 근처 22~28에서 해제)
-    REVEALED_DIGIT: '3',     // 망원경으로 보이는 암호 숫자
+    DISTANCE_TOLERANCE: 3,   // ±3cm (22~28에서 자동 해제)
+    REVEALED_DIGIT: '3',
 
     puzzleArea: null,
     blurEl: null,
+    distanceEl: null,
 
     init() {
         this.puzzleArea = document.getElementById('telescope-puzzle');
         this.blurEl = document.getElementById('telescope-blur');
+        this.distanceEl = document.getElementById('telescope-distance');
 
         GameState.on('sensor', ({ name, value }) => {
-            // 라파/아두이노가 보내는 센서 이름은 'dist' (DIST=18 → dist)
             if (name === 'dist') this.update(value);
         });
 
         GameState.on('view', (view) => this.handleViewChange(view));
     },
-    
+
     handleViewChange(view) {
-        // 전력 복구 후에만 활성. 클리어 여부와 관계없이 우측에 오면 표시
-        // (클리어 후엔 puzzleArea가 단서 박스로 교체되어 있음)
         if (view === 'right' && GameState.powerRestored) {
             this.puzzleArea.classList.remove('hidden');
         } else {
             this.puzzleArea.classList.add('hidden');
         }
     },
-    
+
     update(distance) {
-        // 거리에 따라 블러 강도 조절
-        // 목표 거리(25cm)에서 멀어질수록 블러 ↑
+        if (GameState.puzzles.rightWall.solved) return;
+        if (!this.blurEl) return;
+
+        // 거리 표시 (cm)
+        if (this.distanceEl) {
+            this.distanceEl.textContent = `거리: ${distance} cm`;
+        }
+
+        // v0.0.20: 거리에 따라 블러 + 투명도 동시 조절
+        // 목표(25cm)에 가까울수록 선명 + 진한색
         const diff = Math.abs(distance - this.TARGET_DISTANCE);
-        const blurAmount = Math.min(15, diff * 0.6);
+
+        // 블러: 0(선명) ~ 20px(전혀 안 보임)
+        // diff 0  → blur 0
+        // diff 3  → blur 3 (허용 범위 안)
+        // diff 10 → blur 12
+        // diff 30+ → blur 20 (max)
+        const blurAmount = Math.min(20, diff * 1.2);
+
+        // 투명도: 1.0 (선명) ~ 0.3 (흐릿)
+        const opacity = Math.max(0.3, 1.0 - diff * 0.04);
+
         this.blurEl.style.filter = `blur(${blurAmount}px)`;
+        this.blurEl.style.opacity = opacity;
 
         // 허용 범위 내면 클리어
-        if (diff <= this.DISTANCE_TOLERANCE && !GameState.puzzles.rightWall.solved) {
+        if (diff <= this.DISTANCE_TOLERANCE) {
             this.solve();
         }
     },

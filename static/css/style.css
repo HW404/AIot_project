@@ -748,27 +748,43 @@ body {
 
 /* ==================== 망원경 (오른쪽 벽 퍼즐) ==================== */
 .telescope-view {
-    margin-top: 20px;
+    margin: 20px auto 0;
     width: 240px;
     height: 240px;
     border-radius: 50%;
     border: 4px solid #604830;
     overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
     background: #1a1410;
+    position: relative;
 }
 
 .telescope-blur {
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    filter: blur(10px);
-    transition: filter 0.3s;
+    filter: blur(20px);
+    opacity: 0.3;
+    transition: filter 0.3s ease-out, opacity 0.3s ease-out;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* 망원경 안 숫자 (v0.0.20) */
+.telescope-digit {
+    font-size: 140px;
+    font-weight: bold;
+    color: #e8c896;
+    text-shadow: 0 0 20px rgba(232, 200, 150, 0.5);
+    line-height: 1;
+}
+
+/* 거리 표시 (망원경 아래) */
+.telescope-distance {
+    text-align: center;
+    margin-top: 10px;
+    color: #a08868;
+    font-size: 14px;
+    letter-spacing: 2px;
 }
 
 /* ==================== 디버그 패널 ==================== */

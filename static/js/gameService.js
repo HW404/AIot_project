@@ -220,6 +220,12 @@ class GameService {
         return this._sendToServer({ type: 'restart' });
     }
 
+    // v0.0.19: 모스 신호 재생 요청
+    sendReplayMorse() {
+        console.log('[GameService] 모스 재생 요청');
+        return this._sendToServer({ type: 'replay_morse' });
+    }
+
     sendHintRequest(puzzleName) {
         console.log('[GameService] 힌트 요청:', puzzleName);
         const sent = this._sendToServer({

@@ -95,7 +95,7 @@ const BackWallPuzzle = {
         GameState.solvePuzzle('backWall_radio');
         GameState.addToInventory({
             id: 'radio_signal',
-            name: '무전 신호',
+            name: '라디오 신호',
             description: '무전 연결 성공'
         });
 

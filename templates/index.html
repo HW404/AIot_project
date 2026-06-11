@@ -105,21 +105,21 @@
                 </div>
             </div>
 
-            <!-- 뒷벽 - 무전기 & 키패드 -->
+            <!-- 뒷벽 - 라디오 & 키패드 -->
             <div class="wall back-wall" data-view="back">
                 <div class="wall-image" 
                      style="background-image: url('/static/images/walls/back_wall.png');">
-                    <span class="img-placeholder">뒷벽 - 무전기 & 작업대</span>
+                    <span class="img-placeholder">뒷벽 - 라디오 & 작업대</span>
                 </div>
                 <div class="wall-content">
                     <!-- 전력 복구 전: 어두워서 안 보임 -->
                     <p class="dark-msg puzzle-text" data-dark-for="back">
                         어두워서 아무것도 보이지 않는다.
                     </p>
-                    <!-- 무전기 퍼즐 영역 -->
+                    <!-- 라디오 퍼즐 영역 -->
                     <div id="radio-puzzle" class="puzzle-area hidden">
                         <p class="puzzle-text">
-                            낡은 무전기에서 잡음이 들린다.
+                            낡은 라디오에서 잡음이 들린다.
                             <button class="hint-btn" data-hint="pot" title="힌트">?</button>
                         </p>
                         <p class="hint-text">주파수를 맞춰보자. (가변저항 돌리기)</p>
@@ -141,11 +141,6 @@
                         <p class="hint-text">몇 번 울리는지 잘 들어라. 이게 단서다.</p>
 
                         <div class="morse-display">
-                            <div class="morse-signal-row">
-                                <span class="morse-label">수신</span>
-                                <div id="morse-signal-display" class="morse-signal"></div>
-                            </div>
-
                             <div class="morse-controls">
                                 <button id="morse-play-btn" class="btn-morse">▶ 다시 듣기</button>
                                 <button id="morse-confirm-btn" class="btn-morse" disabled>✓ 들었다</button>
@@ -213,7 +208,9 @@
                         </p>
                         <div class="telescope-view">
                             <div id="telescope-blur" class="telescope-blur">
+                                <span class="telescope-digit">3</span>
                             </div>
+                            <p id="telescope-distance" class="telescope-distance">거리: --</p>
                         </div>
                     </div>
                 </div>

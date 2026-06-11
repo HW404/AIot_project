@@ -142,19 +142,16 @@ const App = {
     // 게임 리셋 (라파에도 명령 송신)
     // ========================================================
     resetGame() {
+        console.log('[Main] 게임 리셋 시작');
         this.stopTimer();
         // 라파에 restart 명령 (TCP 모드일 때만 실제로 전송됨)
-        gameService.sendRestart();
-        // 브라우저 GameState 초기화
-        GameState.reset();
-        // 모듈별 초기화
-        if (typeof HiddenClues !== 'undefined') HiddenClues.reset();
-        if (typeof MorsePuzzle !== 'undefined' && MorsePuzzle.reset) MorsePuzzle.reset();
-        if (typeof LeftWallPuzzle !== 'undefined' && LeftWallPuzzle.reset) LeftWallPuzzle.reset();
-        if (typeof FrontWallPuzzle !== 'undefined' && FrontWallPuzzle.reset) FrontWallPuzzle.reset();
-        // 화면 전환
-        this.switchScreen('lobby-screen');
-        console.log('[Main] 게임 리셋 완료');
+        try { gameService.sendRestart(); } catch (e) { console.warn(e); }
+
+        // v0.0.19: 가장 확실한 리셋은 페이지 새로고침
+        // (퍼즐 HTML이 단서 박스로 교체된 경우 등 복잡한 상태를 모두 초기화)
+        setTimeout(() => {
+            window.location.reload();
+        }, 200);
     },
     
     showEndScreen() {
